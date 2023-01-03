@@ -44,6 +44,8 @@ class Window:
     # Chat Area
     chat: Rectangle = None  # https://i.imgur.com/u544ouI.png
     chat_tabs: List[Rectangle] = []  # https://i.imgur.com/2DH2SiL.png
+    normal_spellbook_autocast: List[Rectangle] = []  # [0] airstrike to [19] fire surge
+    prayer_book: List[Rectangle] = []
 
     # Minimap Area
     compass_orb: Rectangle = None
@@ -170,6 +172,8 @@ class Window:
             self.__locate_inv_slots(cp)
             self.__locate_spells(cp)
             self.__locate_cp_tabs(cp)
+            self.__locate_normal_spellbook_autocast(cp)
+            self.__locate_prayer_book(cp)
             self.control_panel = cp
             return True
         print("Window.__locate_control_panel(): Failed to find control panel.")
@@ -190,6 +194,7 @@ class Window:
                 x += slot_w + gap_x
             y += slot_h + gap_y
 
+<<<<<<< Updated upstream
     def __locate_spells(self, cp: Rectangle) -> None:
         """
         Creates Rectangles for each magic spell relative to the control panel, storing it in the class property.
@@ -203,6 +208,35 @@ class Window:
             x = 30 + cp.left  # start x relative to cp template
             for _ in range(7):
                 self.spellbook_normal.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+=======
+    def __locate_normal_spellbook_autocast(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each magic spell in the autocast menu relative to the control panel, storing it in the class property.
+        """
+        self.normal_spellbook_autocast = []
+        slot_w, slot_h = 16, 10  # dimensions of the spell
+        gap_x, gap_y = 23, 23  # pixel gap between spells
+        y = 55 + cp.top  # start y relative to cp template
+        for _ in range(5):
+            x = 54 + cp.left  # start x relative to cp template
+            for _ in range(4):
+                self.normal_spellbook_autocast.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+                x += slot_w + gap_x
+            y += slot_h + gap_y
+
+    def __locate_prayer_book(self, cp: Rectangle) -> None:
+        """
+        Creates Rectangles for each prayer in the prayerbook menu relative to the control panel, storing it in the class property.
+        """
+        self.prayer_book = []
+        slot_w, slot_h = 26, 23  # dimensions of the prayers
+        gap_x, gap_y = 9, 15  # pixel gap between prayers
+        y = 46 + cp.top  # start y relative to cp template
+        for _ in range(6):
+            x = 33 + cp.left  # start x relative to cp template
+            for _ in range(5):
+                self.prayer_book.append(Rectangle(left=x, top=y, width=slot_w, height=slot_h))
+>>>>>>> Stashed changes
                 x += slot_w + gap_x
             y += slot_h + gap_y
 

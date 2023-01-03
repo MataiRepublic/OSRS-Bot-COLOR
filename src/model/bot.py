@@ -27,6 +27,8 @@ from utilities.geometry import Point, Rectangle
 from utilities.mouse_utils import MouseUtils
 from utilities.options_builder import OptionsBuilder
 from utilities.window import Window, WindowInitializationError
+from utilities.api.status_socket import StatusSocket
+from utilities import random_util as rm
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -561,3 +563,208 @@ class Bot(ABC):
             self.mouse.click()
         else:
             self.log_msg("Run is already off.")
+<<<<<<< Updated upstream
+=======
+
+        
+    def advanced_run_toggle(self, threshold1, threshold2, threshold3, threshold4, threshold5, threshold6):
+
+        if rm.random_chance(probability=0.02):
+            if self.get_run_energy() >= threshold1:
+                self.toggle_run_energy(True)
+                return
+        if rm.random_chance(probability=0.20):
+            if self.get_run_energy() >= threshold2:
+                self.toggle_run_energy(True)
+                return
+        if rm.random_chance(probability=0.35):
+            if self.get_run_energy() >= threshold3:
+                self.toggle_run_energy(True)
+
+        if rm.random_chance(probability=0.50):
+            if self.get_run_energy() >= threshold4:
+                self.toggle_run_energy(True)
+                return
+        if rm.random_chance(probability=0.75):
+            if self.get_run_energy() >= threshold5:
+                self.toggle_run_energy(True)
+
+        if rm.random_chance(probability=1.0):
+            if self.get_run_energy() >= threshold6:
+                self.toggle_run_energy(True)
+                return
+
+    def __open_display_settings(self) -> bool:
+        """
+        Opens the display settings for the game client.
+        Returns:
+            True if the settings were opened, False if an error occured.
+        """
+        control_panel = self.win.control_panel
+        self.mouse.move_to(self.win.cp_tabs[11].random_point())
+        self.mouse.click()
+        time.sleep(0.5)
+        display_tab = imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("cp_settings_display_tab.png"), control_panel)
+        if display_tab is None:
+            self.log_msg("Could not find the display settings tab.")
+            return False
+        self.mouse.move_to(display_tab.random_point())
+        self.mouse.click()
+        time.sleep(0.5)
+        return True
+
+    def autocast_normal_spellbook(self, spell):
+        """
+        Opens the autocast menu and selects a spell. Must have a staff equipped.
+        Args:
+            spell: select a number from 0 to 19, where 0 is air strike and 19 is fire surge
+        """
+        # Click the combat tab
+        self.mouse.move_to(self.win.cp_tabs[0].random_point())
+        pag.click()
+        time.sleep(0.5)
+
+        # Clicks on autocast and selects spell
+        if result := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("mage", "autocast", "staff.png"), self.win.control_panel, 0.05):
+            self.mouse.move_to(result.random_point(), mouseSpeed="medium")
+            self.mouse.click()
+            time.sleep(0.5)
+            self.mouse.move_to(self.win.normal_spellbook_autocast[spell].random_point())
+            time.sleep(0.5)
+            self.mouse.click()
+
+        # Clicks on melee attack style to de-select previously selected autocast
+        if result2 := imsearch.search_img_in_rect(imsearch.BOT_IMAGES.joinpath("melee", "attack", "staff.png"), self.win.control_panel, 0.05):
+            self.mouse.move_to(result2.random_point(), mouseSpeed="medium")
+            self.mouse.click()
+            self.select_combat_style(combat_style="mage", xp_type="autocast")
+            time.sleep(0.5)
+            self.mouse.move_to(self.win.normal_spellbook_autocast[spell].random_point())
+            time.sleep(0.5)
+            self.mouse.click()
+
+    def select_prayers(self, prayer):
+        """
+        Args:
+        prayer: select a number from 0 to 28
+        with (0) being Thick skin and (28) being Augury
+        """
+        self.mouse.move_to(self.win.prayer_book[prayer].random_point())
+        time.sleep(0.5)
+        self.mouse.click()
+
+    def toggle_quick_prayers(self):
+        """
+        toggles quick prayers
+        """
+        self.mouse.move_to(self.win.prayer_orb.random_point())
+        self.mouse.click()
+
+    def drop_selected_items(self, item):
+        """
+        drops all selected items in inventory
+
+        parameter "item" can be found at items_ids.py
+
+        example: self.drop_selected_items(item_ids.OAK_LOGS) will select & drop  all oak logs
+
+        you will need to create a list inside items_ids.py to select multiple items
+
+        """
+        api = StatusSocket()
+          
+        self.log_msg("dropping item...")
+        items = api.get_inv_item_indices(item)
+        
+
+        for x in items:
+            pag.keyDown("shift")
+            self.mouse.move_to(self.win.inventory_slots[x].random_point())
+            self.mouse.click()
+            rm.sleep_random(0.35, 0.5)
+            pass
+        else:
+            pag.keyUp("shift")
+            pass
+
+    def leftclick_items(self, item, lowerbound, upperbound):
+        """
+        left clicks all selected items in inventory
+
+        parameter "item" can be found at items_ids.py
+    
+        lowerbound & uppbound : lower & upper time limit for sleep
+
+        example: self.__leftclick_items(item_ids.BONES,0.7,1) will left click all bones in inventory with 0.7-1 second between clicks
+
+        you will need to create a list inside items_ids.py to select multiple items
+
+        """
+        api = StatusSocket()
+        self.log_msg("left clicking item...")
+        items = api.get_inv_item_indices(item)
+
+        for x in items:
+            self.mouse.move_to(self.win.inventory_slots[x].random_point())
+            self.mouse.click()
+            rm.sleep_random(lowerbound, upperbound)
+
+    def leftclick_two_items(self, item1, item2, lowerbound, upperbound):
+        """
+        uses 2 items on each other by left clicking on each in inventory 
+
+        item1 & item2 can be found at items_ids.py
+
+        lowerbound & uppbound - lower & upper time limit for sleep
+
+        example: self.__leftclick_two_items(item_ids.OAK_LOGS, item_ids.TINDERBOX,3,4) 
+        will burn all oak logs in inventory with 3-4 seconds waiting time between clicks
+
+        you can create a list inside items_ids.py to bundle up multiple items of the same class
+
+        """
+        api = StatusSocket()
+        self.log_msg("left clicking item...")
+        items1 = api.get_inv_item_indices(item1)
+        items2 = api.get_inv_item_indices(item2)
+
+        for x, y in zip(items1, items2):
+            self.mouse.move_to(self.win.inventory_slots[x].random_point())
+            self.mouse.click()
+            rm.sleep_random(lowerbound, upperbound)
+            self.mouse.move_to(self.win.inventory_slots[y].random_point())
+            self.mouse.click()
+            rm.sleep_random(lowerbound, upperbound)
+
+    def random_camera_rotate(self, min_degree: int, max_degree: int, chance: float = 0.5):  #
+        """
+        rotates in either directions within the specified degree range.
+        default chance for either directions (right/left) 0.5 - (50%)
+        Args:
+        min_degree & max_degree: 0 - 360
+        chance:from 0 to 1
+        """
+
+        mean = (min_degree + max_degree) / 2
+        standard_deviation = (max_degree / 2) * 0.33
+        random_degree = rm.truncated_normal_sample(min_degree, max_degree, mean, standard_deviation)
+        if rm.random_chance(probability=chance):
+            self.camera_rotate(direction="right", degree=random_degree)
+        else:
+            self.camera_rotate(direction="left", degree=random_degree)
+
+    def camera_rotate(self,direction:str,degree:int):
+        """
+        Agrs:
+        direction: 'left' or 'right' 
+        degree: 0 - 360
+        """
+        if direction not in ['left', 'right']:
+            raise ValueError(f"Invalid direction '{direction}'. See function docstring for valid options.")
+
+        degrees_per_seconds = 0.01027*degree
+        pag.keyDown(direction)
+        time.sleep(degrees_per_seconds)
+        pag.keyUp(direction)
+        return
+>>>>>>> Stashed changes
