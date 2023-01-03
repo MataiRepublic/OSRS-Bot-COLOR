@@ -4,6 +4,8 @@ import secrets
 from datetime import datetime
 from typing import List
 
+import pyautogui as pag
+
 
 def random_seeds(mod: int = 0, start: int = 8, stop: int = 12):
     """
@@ -132,3 +134,10 @@ def random_chance(probability: float) -> bool:
     if probability < 0.000 or probability > 1.000:
         raise ValueError("Probability must be between 0 and 1")
     return secrets.SystemRandom().random() < probability
+
+
+def sleep_random(lower_bound, upper_bound):  # sleeps within the specified range.
+    mean = (lower_bound + upper_bound) / 2
+    standard_deviation = (upper_bound / 2) * 0.33
+    sleeptime = truncated_normal_sample(lower_bound, upper_bound, mean, standard_deviation)
+    sleep(sleeptime)
